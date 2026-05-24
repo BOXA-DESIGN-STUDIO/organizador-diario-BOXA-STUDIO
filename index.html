@@ -720,6 +720,11 @@ async function enterApp(user){
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('app').style.display='flex';
   document.getElementById('user-lbl').textContent=user.email;
+  // Retry showing install notification after login (in case it was hidden during auth)
+  if(!installPromptFired && window.innerWidth<=640){
+    console.log('[PWA] Showing install notification after login');
+    showInstallNotification();
+  }
   // build planilla once
   if(!_appBuilt){
     build(SZ['a5']);show(0);
@@ -861,7 +866,9 @@ setTimeout(()=>{
 // ── SERVICE WORKER ───────────────────────────────────────────
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register(window.BASE_URL + 'sw.js').catch(()=>{});
+    navigator.serviceWorker.register(window.BASE_URL + 'sw.js')
+      .then(reg=>console.log('[PWA] ✓ Service Worker registered:', reg.scope))
+      .catch(err=>console.log('[PWA] ✗ Service Worker registration failed:', err));
   });
 }
 
